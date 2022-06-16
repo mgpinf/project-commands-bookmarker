@@ -1,14 +1,41 @@
 # if $HOME/.pcb directory doesn't already exist, create it
 [[ -d $HOME/.pcb ]] || mkdir $HOME/.pcb
 
-# flags:
+
 # function to bookmark a directory as project (create .pcbfile in the copy of the directory relative to $HOME and then relative to $HOME/.pcb)
-
-
-# function to remove bookmark from  directory
+function pcbm() {
+  local prefix="$HOME/.pcb"
+  local projectDirectory=$PWD
+  local favoritesDirectory="${prefix}/${projectDirectory#"$HOME/"}"
+  local pcbFile='.pcbfile'
+  mkdir -p "$favoritesDirectory" && echo "Successfully created Directory"
+  touch "$favoritesDirectory/$pcbFile" && echo "Successfully created commands file"
+}
 
 
 # fucntion to add a command to bookmarked commands
+function pcba() {
+  local prefix="$HOME/.pcb"
+  local projectDirectory=$PWD
+  local favoritesDirectory="${prefix}/${projectDirectory#"$HOME/"}"
+
+  read command
+
+  local temp1="${projectDirectory#"$HOME/"}"
+  local temp2="/${temp1}"
+
+  local pcbFile='.pcbfile'
+
+  while [[ -n ${temp2} ]]
+  do
+    output=$(find ${prefix} -wholename "${prefix}${temp2}/${pcbFile}")
+    [[ -n ${output} ]] && break
+    temp2=${temp2%/*}
+  done
+
+  echo $command >> "${prefix}${temp2}/${pcbFile}"
+  echo "Successfully added command \"${command}\" to project ${HOME}${temp2}"
+}
 
 
 # fucntion to select a bookmarked command
