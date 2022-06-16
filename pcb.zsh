@@ -37,7 +37,7 @@ function pcba() {
   done
 
   echo $command >> "${prefix}${temp2}/${pcbCommandsFile}"
-  echo $(pwd) >> "${prefix}${temp2}/${pcbDirsFile}"
+  echo $PWD >> "${prefix}${temp2}/${pcbDirsFile}"
   echo "Successfully added command \"${command}\" to project ${HOME}${temp2}"
 }
 
@@ -83,7 +83,6 @@ function pcbs() {
   [[ -s $resCommandsFilePath ]] || return
 
   # select command among the list of bookmarked commands with help of fzf
-  # command number added before commands to simplify the selection process by just selecting the command no.
   local command=$(cat -n $resCommandsFilePath | sort -uk2 | sort -nk1 | cut -f2- | fzf --layout=reverse)
 
   # if no command selected, return
@@ -161,8 +160,6 @@ function pcbd() {
   [[ -s $resCommandsFilePath ]] || return
 
   # select command among the list of bookmarked commands with help of fzf
-  # command number added before commands to simplify the selection process by just selecting the command no.
-  # by default cat --number returns trailing whitespaces, so remove them using awk
   local command=$(cat -n $resCommandsFilePath | sort -uk2 | sort -nk1 | cut -f2- | fzf --layout=reverse)
 
   # if no command selected, return
