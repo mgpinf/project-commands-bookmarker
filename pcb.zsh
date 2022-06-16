@@ -1,6 +1,42 @@
 # flags:
 # @harsha
 # marking
+
+
+function pcbm(){
+  local prefix="$HOME/.pcb"
+  local projectDirectory=$(pwd)
+  local favoritesDirectory="${prefix}/${projectDirectory#"$HOME/"}"
+  mkdir -p "$favoritesDirectory" && echo "Successfully created Directory"
+  touch "$favoritesDirectory/commands.txt" && echo "Successfully created commands file"
+  chmod +rwx "$favoritesDirectory/commands.txt" && echo "Successfully given permission on commands file"
+}
+
+function pcba(){
+  read command
+  local prefix="$HOME/.pcb"
+  local projectDirectory=$(pwd)
+  local favoritesDirectory="${prefix}/${projectDirectory#"$HOME/"}"
+  
+  temp="${projectDirectory#"$HOME/"}"
+  temp2="/${temp}"
+  
+  while [[ -n ${temp2} ]]; do
+    output=$(find ${prefix} -wholename "${prefix}${temp2}/commands.txt")
+    if [[ -n ${output} ]]; then
+      break
+    fi
+    temp2=${temp2%/*}
+  done
+  
+  echo $command >> "${prefix}${temp2}/commands.txt"
+  echo "Successfully added command \"${command}\" to project ${HOME}${temp2}"
+  
+}
+
+#pcbm
+pcba
+
 # adding
 
 # @manish
