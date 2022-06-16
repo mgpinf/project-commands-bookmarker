@@ -1,5 +1,7 @@
 # Project commands bookmarker
 
+Tired of remembering commands or typing lengthy commands for a particular project? This command line utility will help you remember the commands that you want to run for a project and avoids the need to type them out. It also helps in storing commands that you would have found afer a lot of digging through the internet for a particular project.
+
 ## Script for achieving the following:
 
 - Bookmarking the directories as projects
