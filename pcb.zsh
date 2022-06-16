@@ -8,8 +8,8 @@ function pcbm() {
   local projectDirectory=$PWD
   local favoritesDirectory="${prefix}/${projectDirectory#"$HOME/"}"
   local pcbFile='.pcbfile'
-  mkdir -p "$favoritesDirectory" && echo "Successfully created Directory"
-  touch "$favoritesDirectory/$pcbFile" && echo "Successfully created commands file"
+  mkdir -p "$favoritesDirectory"
+  touch "$favoritesDirectory/$pcbFile" && echo "Bookmarked directory"
 }
 
 
