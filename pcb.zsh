@@ -1,92 +1,123 @@
+# if $HOME/.pcb directory doesn't already exist, create it
+[[ -d $HOME/.pcb ]] || mkdir $HOME/.pcb
+
 # flags:
-# @harsha
-# marking
-# adding
+# function to bookmark a directory as project (create .pcbfile in the copy of the directory relative to $HOME and then relative to $HOME/.pcb)
 
-# @manish
-# selecting
+
+# function to remove bookmark from  directory
+
+
+# fucntion to add a command to bookmarked commands
+
+
+# fucntion to select a bookmarked command
 function pcbs() {
-  local prefix="$HOME/.pcb"
+  local testDir=$PWD
+
+  # if current working directory is $HOME (or) is a subdirectory of $HOME, continue, else return
+  [[ $testDir == $HOME* ]] || return
+
+  # remove $HOME prefix (since we are creating a copy of the directory relative to the home directory to the $HOME/.pcb directory)
+  testDir=${testDir#"$HOME"}
+
+  # if path relative to $HOME is non-empty (not $HOME directory), add '/' to the testDir string for simplifying the further operations
+  [[ $testDir[1] == '/' ]] || testDir='/'$testDir
+
+  local prefixDir="$HOME/.pcb"
   local pcbFile='.pcbfile'
-  local curDir=$PWD
-  local resFilePath
 
-  # if current working directory beyond $HOME, return
-  [[ $curDir == $HOME* ]] || return
-
-  # remove $HOME prefix
-  curDir=${curDir#"$HOME"}
-
-  [[ $curDir[1] == '/' ]] || curDir='/'$curDir
-
-  while [[ -n $curDir ]] && [[ ! -f $prefix$curDir'/'$pcbFile ]]
+  # while testDir isn't empty w.r.t $HOME directory and .pcbfile does not exist in the testDir w.r.t to the prefix directory, move testDir string one directory up
+  while [[ -n $testDir ]] && [[ ! -f $prefixDir'/'${testDir:1}'/'$pcbFile ]]
   do
-    # remove last part of current directory
-    curDir=${curDir%/*}
-    [[ -z $curDir ]] && break
+    # remove bottommost directory in the testDir string (make the current test directory it's parent (or) move testDir one directory up)
+    testDir=${testDir%/*}
   done
 
-  if [[ -n $curDir ]]
+  local resFilePath
+
+  if [[ -n $testDir ]]
   then
-    curDir="${curDir:1}"
-    resFilePath="$prefix/$curDir/$pcbFile"
+    # remove '/' at beginning of testDir string if not empty since we don't need it anymore, we had just used it to simplify the process of moving to the parent directory
+    testDir=${testDir:1}
+    resFilePath="$prefixDir/$testDir/$pcbFile"
   else
-    resFilePath="$prefix/$pcbFile"
+    resFilePath="$prefixDir/$pcbFile"
   fi
 
-  if [[ ! -s $resFilePath ]]
-  then
-    echo 'Nothing to show'
-    return
-  fi
+  # if the .pcbfile in the resultant directory is empty, return
+  [[ -s $resFilePath ]] || return
 
-  local command=$(cat --number $resFilePath | awk '{$1=$1;print}' | fzf --layout=reverse)
-  [[ -z $command ]] && return
+  # select command among the list of bookmarked commands with help of fzf
+  # command number added before commands to simplify the selection process by just selecting the command no.
+  # by default cat --number returns trailing whitespaces, so remove them using awk
+  local commandWithLineNo=$(cat --number $resFilePath | awk '{$1=$1;print}' | fzf --layout=reverse)
 
+  # if no command selected, return
+  [[ -z $commandWithLineNo ]] && return
+
+  # regex to obtain first word in string
   local regex='s/^\w*\ *//'
-  command=$(echo $command | sed -e $regex)
+
+  # apply regex on the command with line no. to obtain the command (delete line no. from command, i.e. the first word from the command)
+  local command=$(echo $commandWithLineNo | sed --expression $regex)
+
+  # execute obtained command
   eval $command
 }
 
-# deleting
+
+# fucntion to delete a bookmarked command
 function pcbd() {
-  local prefix="$HOME/.pcb"
+  local testDir=$PWD
+
+  # if current working directory is an ancestor of $HOME, return
+  [[ $testDir == $HOME* ]] || return
+
+  # remove $HOME prefix (since we are creating a copy of the directory relative to the home directory to the $HOME/.pcb directory)
+  testDir=${testDir#"$HOME"}
+
+  # if path relative to $HOME is non-empty (not $HOME directory), add '/' to the testDir string for simplifying the further operations
+  [[ $testDir[1] == '/' ]] || testDir='/'$testDir
+
+  local prefixDir=$HOME/.pcb
   local pcbFile='.pcbfile'
-  local curDir=$PWD
-  local resFilePath
 
-  # if current working directory beyond $HOME, return
-  [[ $curDir == $HOME* ]] || return
-
-  # remove $HOME prefix
-  curDir=${curDir#"$HOME"}
-
-  [[ $curDir[1] == '/' ]] || curDir='/'$curDir
-
-  while [[ -n $curDir ]] && [[ ! -f $prefix$curDir'/'$pcbFile ]]
+  # while testDir isn't empty w.r.t $HOME directory and .pcbfile does not exist in the testDir w.r.t to the prefix directory, move testDir string one directory up
+  while [[ -n $testDir ]] && [[ ! -f $prefixDir'/'${testDir:1}'/'$pcbFile ]]
   do
-    # remove last part of current directory
-    curDir=${curDir%/*}
-    [[ -z $curDir ]] && break
+    # remove bottommost directory in the testDir string (make the current test directory it's parent (or) move testDir one directory up)
+    testDir=${testDir%/*}
   done
 
-  if [[ -n $curDir ]]
+  local resFilePath
+
+  if [[ -n $testDir ]]
   then
-    curDir="${curDir:1}"
-    resFilePath="$prefix/$curDir/$pcbFile"
+    # remove '/' at beginning of testDir string if not empty since we don't need it anymore, we had just used it to simplify the process of moving to the parent directory
+    testDir=${testDir:1}
+    resFilePath="$prefixDir/$testDir/$pcbFile"
   else
-    resFilePath="$prefix/$pcbFile"
+    resFilePath="$prefixDir/$pcbFile"
   fi
 
-  if [[ ! -s $resFilePath ]]
-  then
-    echo 'Nothing to show'
-    return
-  fi
+  # if the .pcbfile in the resultant directory is empty, return
+  [[ -s $resFilePath ]] || return
 
-  local command=$(cat --number $resFilePath | awk '{$1=$1;print}' | fzf --layout=reverse)
-  [[ -z $command ]] && return
+  # select command among the list of bookmarked commands with help of fzf
+  # command number added before commands to simplify the selection process by just selecting the command no.
+  # by default cat --number returns trailing whitespaces, so remove them using awk
+  local commandWithLineNo=$(cat --number $resFilePath | awk '{$1=$1;print}' | fzf --layout=reverse)
+
+  # if no command selected, return
+  [[ -z $commandWithLineNo ]] && return
+
+  # regex to obtain first occurrence of a number in the selected string (used to delete specific line no. in the .pcbfile)
   local regex='s/^([^.]+).*$/\1/; s/^[^0-9]*([0-9]+).*$/\1/'
-  command=$(echo $command | sed -r $regex)
-  sed -i "${command}d" $resFilePath
+
+  # apply regex on the command with line no. to obtain the line no. to be deleted
+  local lineNo=$(echo $commandWithLineNo | sed --regexp-extended $regex)
+
+  # delete specific line no. from the .pcbfile
+  sed -i "${lineNo}d" $resFilePath
 }
