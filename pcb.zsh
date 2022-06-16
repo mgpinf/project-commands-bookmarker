@@ -7,13 +7,15 @@ function pcbm() {
   local prefix="$HOME/.pcb"
   local projectDirectory=$PWD
   local favoritesDirectory="${prefix}/${projectDirectory#"$HOME/"}"
-  local pcbFile='.pcbfile'
+  local pcbCommandsFile='.pcbCommandsfile'
+  local pcbDirsFile='.pcbDirsfile'
   mkdir -p "$favoritesDirectory"
-  touch "$favoritesDirectory/$pcbFile" && echo "Bookmarked directory"
+  touch "$favoritesDirectory/$pcbCommandsFile"
+  touch "$favoritesDirectory/$pcbDirsFile" && echo "Bookmarked directory as a Project"
 }
 
 
-# fucntion to add a command to bookmarked commands
+# function to add a command to bookmarked commands
 function pcba() {
   local prefix="$HOME/.pcb"
   local projectDirectory=$PWD
@@ -24,19 +26,20 @@ function pcba() {
   local temp1="${projectDirectory#"$HOME/"}"
   local temp2="/${temp1}"
 
-  local pcbFile='.pcbfile'
+  local pcbCommandsFile='.pcbCommandsfile'
+  local pcbDirsFile='.pcbDirsfile'
 
   while [[ -n ${temp2} ]]
   do
-    output=$(find ${prefix} -wholename "${prefix}${temp2}/${pcbFile}")
+    output=$(find ${prefix} -wholename "${prefix}${temp2}/${pcbCommandsFile}")
     [[ -n ${output} ]] && break
     temp2=${temp2%/*}
   done
 
-  echo $command >> "${prefix}${temp2}/${pcbFile}"
+  echo $command >> "${prefix}${temp2}/${pcbCommandsFile}"
+  echo $(pwd) >> "${prefix}${temp2}/${pcbDirsFile}"
   echo "Successfully added command \"${command}\" to project ${HOME}${temp2}"
 }
-
 
 # fucntion to select a bookmarked command
 function pcbs() {
