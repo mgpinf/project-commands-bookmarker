@@ -28,9 +28,11 @@ Tired of remembering commands or typing lengthy commands for a particular projec
   - **delete**
     - if bookmark file exists, use it for deleting selected bookmarked command, else, search for the lowest ancestor directory for bookmark file and use that, since the current directory could be a project subdirctory
 
-## Commands
+## Prerequisites
+- [fzf](https://github.com/junegunn/fzf)
 
+## Commands
 ```
-git clone https://github.com/Manish0925/pcb.git
+git clone https://github.com/Manish0925/project-commands-bookmarker.git
 echo "source $PWD/pcb/pcb.zsh" >> ~/.zshrc
 ```
