@@ -34,5 +34,5 @@ Tired of remembering commands or typing lengthy commands for a particular projec
 ## Commands
 ```
 git clone https://github.com/Manish0925/project-commands-bookmarker.git
-echo "source $PWD/pcb/pcb.zsh" >> ~/.zshrc
+echo "source $PWD/project-commands-bookmarker/pcb.zsh" >> ~/.zshrc
 ```
